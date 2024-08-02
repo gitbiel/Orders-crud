@@ -39,20 +39,23 @@ export class PedidoService {
     } catch (error) {
       throw new BadRequestException(error.errors);
     }
-  
+
     const CpfJaExiste = await this.prisma.pedido.findFirst({
       where: { cpfCnpj: createPedidoDto.cpfCnpj },
     });
-  
+
     if (CpfJaExiste) {
       throw new ConflictException('CPF/CNPJ já cadastrado.');
     }
-  
-    const dataPedido = new Date();
-  
+
+    const dataPedidoUTC = new Date();
+    
+    const ajusteBRT = -3 * 60 * 60 * 1000;
+    const dataPedidoBRT = new Date(dataPedidoUTC.getTime() + ajusteBRT);
+    
     const doisDiasEmMilissegundos = 3600000 * 24 * 2;
-    const dataPublicacao = new Date(dataPedido.getTime() + doisDiasEmMilissegundos);
-  
+    const dataPublicacaoBRT = new Date(dataPedidoBRT.getTime() + doisDiasEmMilissegundos);
+
     return this.prisma.pedido.create({
       data: {
         nome: createPedidoDto.nome,
@@ -62,8 +65,8 @@ export class PedidoService {
         quantidadeDiarias: createPedidoDto.quantidadeDiarias,
         nomeEdificio: createPedidoDto.nomeEdificio,
         moradorDoEdificio: createPedidoDto.moradorDoEdificio,
-        dataPedido,
-        dataPublicacao,
+        dataPedido: dataPedidoBRT,
+        dataPublicacao: dataPublicacaoBRT,
       },
     });
   }
