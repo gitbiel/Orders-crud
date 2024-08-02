@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException, ConflictException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreatePedidoDto, CreatePedidoDtoType } from 'src/dto/create-pedido.dto';
 
@@ -9,7 +9,7 @@ export class PedidoService {
   async findAll() {
     return this.prisma.pedido.findMany();
   }
-
+  
   async findById(id: string) {
     const pedido = await this.prisma.pedido.findUnique({
       where: { id },
@@ -39,7 +39,20 @@ export class PedidoService {
     } catch (error) {
       throw new BadRequestException(error.errors);
     }
-
+  
+    const CpfJaExiste = await this.prisma.pedido.findFirst({
+      where: { cpfCnpj: createPedidoDto.cpfCnpj },
+    });
+  
+    if (CpfJaExiste) {
+      throw new ConflictException('CPF/CNPJ já cadastrado.');
+    }
+  
+    const dataPedido = new Date();
+  
+    const doisDiasEmMilissegundos = 3600000 * 24 * 2;
+    const dataPublicacao = new Date(dataPedido.getTime() + doisDiasEmMilissegundos);
+  
     return this.prisma.pedido.create({
       data: {
         nome: createPedidoDto.nome,
@@ -49,13 +62,9 @@ export class PedidoService {
         quantidadeDiarias: createPedidoDto.quantidadeDiarias,
         nomeEdificio: createPedidoDto.nomeEdificio,
         moradorDoEdificio: createPedidoDto.moradorDoEdificio,
-        pedidoId: createPedidoDto.pedidoId,
-        dataPedido: createPedidoDto.dataPedido,
-        dataPublicacao: createPedidoDto.dataPublicacao,
-        criadoEm: new Date(),
+        dataPedido,
+        dataPublicacao,
       },
     });
   }
-
-
 }

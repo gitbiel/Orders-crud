@@ -8,19 +8,16 @@ datasource db {
 }
 
 model Pedido {
-  id                 String    @id @default(uuid())
-  nome               String
-  razaoSocial        String
-  cpfCnpj            String
-  pj                 Boolean?
-  quantidadeDiarias  Int
-  nomeEdificio       String
-  moradorDoEdificio  Boolean
-  pedidoId           String
-  dataPedido         DateTime
-  dataPublicacao     DateTime 
-  criadoEm           DateTime @default(now())
+  id                String   @id @default(uuid())
+  nome              String
+  razaoSocial       String
+  cpfCnpj           String   @unique
+  pj                Boolean?
+  quantidadeDiarias Int
+  nomeEdificio      String
+  moradorDoEdificio Boolean
+  dataPedido        DateTime @default(now())
+  dataPublicacao    DateTime @default(now())
 
   @@map("pedidos")
 }
-
