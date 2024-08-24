@@ -21,3 +21,17 @@ model Pedido {
 
   @@map("pedidos")
 }
+
+model Edificio {
+  id           String @id @default(uuid())
+  nomeEdificio String
+  cep          String
+  rua          String
+  numero       String
+  bairro       String
+  cidade       String
+  estado       String
+  url          String
+
+  @@map("edificios")
+}

@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException, BadRequestException, ConflictException } from '@nestjs/common';
-import { PrismaService } from 'src/prisma/prisma.service';
 import { CreatePedidoDto, CreatePedidoDtoType } from 'src/dto/create-pedido.dto';
+import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
 export class PedidoService {
